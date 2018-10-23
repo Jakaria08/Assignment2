@@ -1,0 +1,198 @@
+\documentclass[11pt]{article}
+
+\newcommand{\semester}{Fall 2018}
+\usepackage{fancyhdr,multicol}
+\usepackage{amsmath,amssymb}
+
+
+%% Custom page layout.
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-2in}
+\setlength{\topmargin}{-.5in}
+\setlength{\headsep}{.5in}
+\addtolength{\headsep}{-\headheight}
+\setlength{\footskip}{.5in}
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\flushbottom
+
+\allowdisplaybreaks
+
+%% Custom headers and footers.
+\pagestyle{fancyplain}
+\let\headrule=\empty
+\let\footrule=\empty
+\lhead{\fancyplain{}{\semester}}
+\rhead{\fancyplain{}{CMPUT 466/566: Machine Learning}}
+\cfoot{{\thepage/\pageref{EndOfAssignment}}}
+
+%% Macros to generate question and part numbers automatically
+\newcounter{totalmarks}
+\setcounter{totalmarks}{0}
+\newcounter{questionnumber}
+\setcounter{questionnumber}{0}
+\newcounter{subquestionnumber}[questionnumber]
+\setcounter{subquestionnumber}{0}
+\renewcommand{\thesubquestionnumber}{(\alph{subquestionnumber})}
+\newcommand{\question}[2][]%
+  {\ifx\empty#2\empty\else
+   \addtocounter{totalmarks}{#2}\refstepcounter{questionnumber}\fi
+   \bigskip\noindent\textbf{\Large Question \thequestionnumber. } #1
+   {\scshape\ifx\empty#2\empty(continued)\else
+   [#2 mark\ifnum #2 > 1 s\fi]\fi}\par
+   \medskip\noindent\ignorespaces}
+\newcommand{\subquestion}[2][]%
+  {\ifx\empty#2\empty\else\refstepcounter{subquestionnumber}\fi
+   \medskip\noindent\textbf{\large \thesubquestionnumber } #1
+   {\scshape\ifx\empty#2\empty(continued)\else
+   [#2 mark\ifnum #2 > 1 s\fi]\fi}
+   \smallskip\noindent\ignorespaces}
+\newcommand{\bonus}[2][]%
+  {\ifx\empty#2\empty\else
+   \refstepcounter{questionnumber}\fi
+   \bigskip\noindent\textbf{\Large Bonus (mandatory for 566). } #1
+   {\scshape\ifx\empty#2\empty(continued)\else
+   [#2 mark\ifnum #2 > 1 s\fi]\fi}\par
+   \medskip\noindent\ignorespaces}
+
+% \newcommand{\bonus}[2][]%
+%   {\bigskip\noindent\textbf{\Large Bonus (mandatory for 566). } #1
+%    {\scshape\ifx\empty#2\empty(continued)\else
+%    [#2 mark\ifnum #2 > 1 s\fi]\fi}\par
+%    \medskip\noindent\ignorespaces}
+
+% Enable final count to be printed at top
+\usepackage{totcount}
+\regtotcounter{totalmarks}
+\usepackage{hyperref}
+\begin{document}
+
+\thispagestyle{plain}
+
+\begin{center}
+\bfseries
+{\Large Homework Assignment \# 2}\\
+   Due: Thursday, October 25, 2018, 11:59 p.m. \\
+   Total marks: \total{totalmarks}
+\end{center}
+
+
+\newcommand{\expf}[1]{\exp\left( #1 \right)}
+
+\question{25}
+
+Let $X_1, \ldots, X_n$ be i.i.d. Gaussian random variables, 
+each having an unknown mean $\theta$ and known variance $\sigma_0^2$. 
+ 
+\subquestion{5}
+ Assume $\theta$ is itself selected from a normal distribution $\mathcal{N}(\mu, \sigma^2)$ 
+ having a known mean $\mu$ and a known variance $\sigma^2$.
+What is the maximum a posteriori (MAP) estimate of $\theta$?
+
+\subquestion{10}
+ Assume $\theta$ is itself selected from a Laplace distribution $\mathcal{L}(\mu, b)$ 
+ having a known mean (location) $\mu$ and a known scale (diversity) $b$.
+ Recall that the pdf for a Laplace distribution is
+ %
+ \begin{align*}
+ p(x) = \frac{1}{2b} \expf{\frac{-|x - \mu |}{b}}
+ \end{align*}
+ %
+ %
+ For simplicity, assume $\mu = 0$.
+What is the maximum a posteriori estimate of $\theta$?
+If you cannot find a closed form solution, explain how
+you would use an iterative approach to obtain the solution.
+
+\subquestion{10}
+Now assume that we have \textbf{multivariate} i.i.d. Gaussian random variables, 
+$\mathbf{X}_1, \ldots, \mathbf{X}_n$ with each 
+$\mathbf{X}_i \sim \mathcal{N}(\boldsymbol{\theta}, \boldsymbol{\Sigma}_0)$ 
+for some unknown mean $\boldsymbol{\theta} \in \mathbb{R}^d$ and 
+known $\boldsymbol{\Sigma}_0 = \mathbf{I} \in \mathbb{R}^{d \times  d}$,
+where $\mathbf{I}$ is the identity matrix.
+ Assume $\boldsymbol{\theta} \in \mathbb{R}^d$ is selected from a zero-mean multivariate Gaussian 
+ $\mathcal{N}(\boldsymbol{\mu} = \mathbf{0}, \boldsymbol{\Sigma} = \sigma^2 \mathbf{I})$ 
+ and a known variance parameter $\sigma^2$ on the diagonal.
+What is the MAP estimate of $\boldsymbol{\theta}$?
+ 
+
+\question{75}
+
+In this question, you will implement variants of linear regression.
+We will be examining some of the practical aspects
+of implementing regression, including for a large number of features and samples.
+An initial script in python has been given to you, called
+\verb+script_regression.py+, and associated python files.
+You will be running on a UCI dataset for CT slices\footnote{\href{https://archive.ics.uci.edu/ml/datasets/Relative+location+of+CT+slices+on+axial+axis}{\url{https://archive.ics.uci.edu/ml/datasets/Relative+location+of+CT+slices+on+axial+axis}}}, with 385 features
+and 53,500 samples. 
+Baseline algorithms, including mean and random predictions,
+are used to serve as sanity checks. We should be able to outperform
+random predictions, and the mean value of the target in the training set.
+
+
+\subquestion{5}
+The main linear regression class is \verb+FSLinearRegression+.
+The FS stands for FeatureSelect.
+The provided implementation has subselected features
+and then simply explicitly solved for 
+$\mathbf{w} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}$.
+Increase the number of selected features (up to all the features).
+What do you find?
+How can this be remedied?
+
+\subquestion{5}
+The current code averages the error over multiple training, test sets, subsampled from the data.
+Modify the code to additionally report the standard error over these multiple runs (i.e., the sample standard deviation divided by the square root of the number of runs). 
+
+\subquestion{5}
+Now implement Ridge Regression, where a ridge regularizer 
+$ \lambda \| \mathbf{w} \|_2^2$ is added to the optimization.
+Run this algorithm on all the features. How does the result differ from (a)?
+Discuss the result in a couple of sentences, for one regularization parameter, $\lambda = 0.01$. 
+
+\subquestion{20}
+Now imagine that you want to try a feature selection method
+and you've heard all about this amazing and mysterious Lasso. 
+Lasso can often be described as an algorithm, or otherwise as an
+objective with a least-squares loss and $\ell_1$ regularizer. 
+It is more suitably thought of as the objective, rather than an algorithm,
+as there are many algorithms to solve the Lasso.
+Implement an iterative solution approach that uses the soft thresholding operator (also called the shrinkage operator),
+described in the chapter on advanced optimization techniques.
+
+\subquestion{20}
+Implement a stochastic gradient descent approach to obtaining the
+linear regression solution (see the chapter on advanced optimization techniques). 
+Report the error, for a step-size of 0.01 and 1000 epochs. 
+
+\subquestion{20}
+Implement batch gradient descent for linear regression, using line search.
+Compare stochastic gradient descent to batch gradient descent, in terms
+of the number of times the entire training set is processed. 
+Set the step-size to 0.01 for stochastic gradient descent.
+Report the error versus epochs, where one epoch involves processing the training set once. 
+Report the error versus runtime. 
+
+
+\bonus{20}
+
+Previously you implemented several variants of linear regression using scalar learning rates and line search. While for small problems setting a scalar learning rate can be done through parameter studies, it is in our benefit to adjust learning rates according to the training data at each training step. In this question you will be implementing two adaptive learning rate algorithms for stochastic gradient descent, which adaptively set learning rates for each feature. For both algorithms report the error after 1000 epochs of training.
+
+\subquestion{10}
+
+One commonly used (although unpublished!) method is RMSProp proposed by Geoffrey Hinton in his course taught at the University of Toronto \footnote{\href{http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf}{\url{http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf}}}.
+
+\subquestion{10}
+
+The next algorithm you will need to implement can be found in \emph{On the Convergence of Adam and Beyond} by Sashank J. Reddi, Satyen Kale and Sanjiv Kumar published in the International Conference on Learning Representations in 2018 \footnote{\href{https://openreview.net/pdf?id=ryQu7f-RZ}{\url{https://openreview.net/pdf?id=ryQu7f-RZ}}}.
+
+
+
+
+
+\label{EndOfAssignment}%
+
+\end{document}
